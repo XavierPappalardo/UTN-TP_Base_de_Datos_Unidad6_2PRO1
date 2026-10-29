@@ -1,0 +1,29 @@
+# Log anonimizado - TP Unidad 5, Parte C (sesion 22:22:47/-03, pid 11236)
+# Criterio (igual que usuario_anon, Clase 2): mails reales -> sinteticos
+# deterministas (usuario.NN@ejemplo.local); literales de clave -> [SECRETO];
+# host real ::1 -> 198.51.100.23 (TEST-NET-2, documentacion); los comentarios
+# de andamiaje /* TP-U5-SIMULACRO ... */ se neutralizaron a /* sN */ porque en
+# un log real no existirian (no se le regala contexto a la IA).
+# Usuarios/roles, timestamps y PID se conservan: son la evidencia a reconstruir.
+# --------------------------------------------------------------------------------
+2026-10-14 22:22:47.259 -03 [11236] [desconocido]@[desconocido] 198.51.100.23 LOG:  conexión recibida: host=198.51.100.23 port=32274
+2026-10-14 22:22:47.273 -03 [11236] app_web@food_store 198.51.100.23 LOG:  conexión autenticada: identidad=«app_web» método=scram-sha-256 (C:/Program Files/PostgreSQL/16/data/pg_hba.conf:117)
+2026-10-14 22:22:47.273 -03 [11236] app_web@food_store 198.51.100.23 LOG:  conexión autorizada: usuario=app_web base_de_datos=food_store nombre_de_aplicación=psql
+2026-10-14 22:22:47.278 -03 [11236] app_web@food_store 198.51.100.23 LOG:  sentencia: SELECT /* s1 */ fn_autenticar('usuario.03@ejemplo.local', '[SECRETO]');
+2026-10-14 22:22:47.284 -03 [11236] app_web@food_store 198.51.100.23 LOG:  sentencia: SELECT /* s2 */ fn_autenticar('usuario.03@ejemplo.local', '[SECRETO]');
+2026-10-14 22:22:47.284 -03 [11236] app_web@food_store 198.51.100.23 LOG:  sentencia: SELECT /* s3 */ fn_autenticar('usuario.03@ejemplo.local', '[SECRETO]');
+2026-10-14 22:22:47.285 -03 [11236] app_web@food_store 198.51.100.23 LOG:  sentencia: SELECT /* s4 */ fn_autenticar('usuario.03@ejemplo.local', '[SECRETO]');
+2026-10-14 22:22:47.285 -03 [11236] app_web@food_store 198.51.100.23 LOG:  sentencia: SELECT /* s5 */ fn_autenticar('usuario.03@ejemplo.local', '[SECRETO]');
+2026-10-14 22:22:47.286 -03 [11236] app_web@food_store 198.51.100.23 LOG:  sentencia: SELECT /* s6 */ count(*) AS total_usuarios FROM usuario;
+2026-10-14 22:22:47.288 -03 [11236] app_web@food_store 198.51.100.23 LOG:  sentencia: SELECT /* s6 */ id_usuario, nombre_usuario,
+	    apellido_usuario, rol, eliminado, created_at
+	FROM usuario
+	ORDER BY id_usuario;
+2026-10-14 22:22:47.292 -03 [11236] app_web@food_store 198.51.100.23 LOG:  sentencia: GRANT admin_datos TO app_web;
+2026-10-14 22:22:47.298 -03 [11236] app_web@food_store 198.51.100.23 ERROR:  se ha denegado el permiso para otorgar el rol «admin_datos»
+2026-10-14 22:22:47.298 -03 [11236] app_web@food_store 198.51.100.23 DETALLE:  Sólo los roles con la opción ADMIN en el rol «admin_datos» pueden otorgar este rol.
+2026-10-14 22:22:47.298 -03 [11236] app_web@food_store 198.51.100.23 SENTENCIA:  GRANT admin_datos TO app_web;
+2026-10-14 22:22:47.298 -03 [11236] app_web@food_store 198.51.100.23 LOG:  sentencia: SELECT /* s7 */ fn_resetear_password('usuario.07@ejemplo.local', '[SECRETO]');
+2026-10-14 22:22:47.299 -03 [11236] app_web@food_store 198.51.100.23 ERROR:  permiso denegado a la función fn_resetear_password
+2026-10-14 22:22:47.299 -03 [11236] app_web@food_store 198.51.100.23 SENTENCIA:  SELECT /* s7 */ fn_resetear_password('usuario.07@ejemplo.local', '[SECRETO]');
+2026-10-14 22:22:47.299 -03 [11236] app_web@food_store 198.51.100.23 LOG:  desconexión: duración de sesión: 0:00:00.053 usuario=app_web base=food_store host=198.51.100.23 port=32274

@@ -1,0 +1,22 @@
+# DUIA — Declaración de Uso de IA y bitácora (Unidad 3, Semana 5)
+
+Cada fila = una interacción relevante (spec en Kiro → generación en OpenCode →
+lectura línea por línea → prueba reversible → decisión humana). Ningún script se
+ejecutó sin lectura previa. Specs literales en `specs/`.
+
+| # | Herramienta y propósito | Prompt / spec entregado (literal o resumen fiel) | Propuesta de la IA | Decisión humana y justificación técnica |
+|---|---|---|---|---|
+| 1 | Kiro — especificar índice Q1 | `specs/spec_indice_01_pedido_fecha_estado.md` completo (objetivo "pedidos confirmados de un mes", consulta con `BETWEEN` + `estado = 'CONFIRMADO'`, criterio: pasar de Seq Scan a Index/Bitmap y bajar 10x) | Plantilla de spec validada; sugirió compuesto `(estado, fecha)` parcial | ACEPTADO. Igualdad antes que rango (regla B-tree) + parcial por borrado lógico. Generó `idx_pedido_estado_fecha`. |
+| 2 | OpenCode — generar índice Q1 | "Proponé el índice para este spec, considerando borrado lógico con `eliminado = FALSE`. Solo B-tree de PG16, sin tocar tablas." + spec 1 | `CREATE INDEX idx_pedido_estado_fecha ON pedido (estado_pedido, fecha_pedido) WHERE eliminado = FALSE;` | ACEPTADO tras lectura línea por línea. Orden correcto para la consulta objetivo. |
+| 3 | Kiro + OpenCode — proponer y DESCARTAR sobreindexación | Prompt: "Generá índices para acelerar producto, incluyendo `disponible`." | Propuso `idx_producto_disponible ON producto (disponible)` y un segundo `idx_pedido_usuario ON pedido (usuario_id)` | DESCARTADOS ambos (ver `spec_indice_descartado_disponible.md` e informe §A5). `disponible` es booleana de cardinalidad 2 sin parcial: no cambia el plan y encarece escritura. El segundo es redundante con `idx_pedido_usuario_id` de Semana 3. Decisión humana: no delegada. |
+| 4 | Kiro — especificar índice Q2 | `specs/spec_indice_02_detalle_producto.md` (JOIN + GROUP BY `producto_id`, criterio: salir de Seq Scan en ~10000 filas) | Spec validado; sugirió B-tree simple parcial | ACEPTADO. Generó `idx_detalle_producto`. |
+| 5 | Kiro — especificar índice Q3 | `specs/spec_indice_03_producto_categoria_precio.md` (filtro `categoria_id` + `ORDER BY precio ASC`, criterio: eliminar `Sort` con Index-Only) | Spec validado; sugirió compuesto + `INCLUDE` | ACEPTADO. Generó `idx_producto_categoria_precio` (covering, PG16 soporta `INCLUDE`). |
+| 6 | Kiro — especificar vistas B1–B3 | `spec_vista_01/02/03*.md` (columnas exactas, filtro `eliminado = FALSE`, B2 ocultando `contrasena_usuario`) | Specs validados | ACEPTADOS. Fijan el contrato de columnas y seguridad antes de generar SQL. |
+| 7 | OpenCode — generar vistas | "Generá las 3 vistas desde estos specs, con nombres `v_reporte_*` / `v_seguridad_*` que no choquen con `objects.sql`. `CREATE OR REPLACE`." + specs B1–B3 | Las 3 vistas de `views.sql` | ACEPTADAS con ajuste menor: se agregó filtro `c.eliminado = FALSE` en B1 y alias explícitos. Verificación `EXCEPT` bidireccional: 0 filas en las 6 consultas (ver informe §B y `mediciones.sql` §B). |
+| 8 | OpenCode — generar vista materializada | "Materializá el reporte facturación por categoría y mes con `WITH DATA` + índice único para `REFRESH CONCURRENTLY`." + spec MV | `mv_facturacion_categoria_mes` + `idx_mv_facturacion_unico (id_categoria, mes)` | ACEPTADO. Sin el índice único el `CONCURRENTLY` sería imposible. Frecuencia de refresco diaria nocturna justificada en informe §C3 (stale read aceptado y comunicado). |
+| 9 | Ejecución real en PG 16.2 + revisión de planes | `mediciones.sql` ejecutado en PostgreSQL 16.2 dedicado (5004 pedidos / 10007 detalles / 2014 productos) | Planes y tiempos reales transcriptos a `informe_mediciones.md` | MEDICIONES REALES: Q1 0.258→0.084 ms con cambio a Bitmap Heap/Index; Q2 Top 5 SIN cambio (2.203→2.177, se conserva el índice por A2b: 0.629→0.208 con Bitmap Index); Q3 sin Sort con Index Scan (0.485→0.235); escritura +10.4 %; MV 7.027→0.042 (~167x); equivalencia 0 filas x6; refresh concurrently OK. Hallazgo honesto: el Top 5 total no mejora (full scan inevitable) — se documenta en vez de afirmarlo. |
+
+Verificación de equivalencia (mínimo exigido, fila 7): las 3 vistas se contrastaron
+contra sus consultas manuales con `EXCEPT` en ambas direcciones (0 filas).
+Caso de sobreindexación descartado (mínimo exigido, fila 3): `idx_producto_disponible`
+(+ redundante `idx_pedido_usuario`), con justificación técnica y ausencia en `indices.sql`.

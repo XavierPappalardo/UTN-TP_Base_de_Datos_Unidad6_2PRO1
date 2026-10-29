@@ -1,0 +1,26 @@
+# Fragmento de log — TP Unidad 5, Parte B (2026-10-14 22:18:07/-03)
+# Servidor: PostgreSQL 16.15 local (C:/Program Files/PostgreSQL/16/data/log/postgresql-2026-10-14_130038.log)
+# Config: log_connections=on, log_disconnections=on, log_statement='mod',
+# log_line_prefix='%m [%p] %u@%d %h'. Script: sql/auditoria_test.sql + login fallido app_web.
+# NOTA: el SELECT de lectura NO aparece como sentencia (log_statement='mod'
+# solo registra DDL y escritura): ver analisis en docs/informe_auditoria.md punto 3.
+# --------------------------------------------------------------------------------
+2026-10-14 22:18:07.999 -03 [9120] [desconocido]@[desconocido] ::1 LOG:  conexión recibida: host=::1 port=44319
+2026-10-14 22:18:08.013 -03 [9120] postgres@food_store ::1 LOG:  conexión autenticada: identidad=«postgres» método=scram-sha-256 (C:/Program Files/PostgreSQL/16/data/pg_hba.conf:117)
+2026-10-14 22:18:08.013 -03 [9120] postgres@food_store ::1 LOG:  conexión autorizada: usuario=postgres base_de_datos=food_store nombre_de_aplicación=psql
+2026-10-14 22:18:08.022 -03 [9120] postgres@food_store ::1 LOG:  desconexiÃ³n: duraciÃ³n de sesiÃ³n: 0:00:00.045 usuario=postgres base=food_store host=::1 port=44319
+2026-10-14 22:18:37.783 -03 [8932] [desconocido]@[desconocido] ::1 LOG:  conexión recibida: host=::1 port=38568
+2026-10-14 22:18:37.800 -03 [8932] postgres@food_store ::1 LOG:  conexión autenticada: identidad=«postgres» método=scram-sha-256 (C:/Program Files/PostgreSQL/16/data/pg_hba.conf:117)
+2026-10-14 22:18:37.800 -03 [8932] postgres@food_store ::1 LOG:  conexión autorizada: usuario=postgres base_de_datos=food_store nombre_de_aplicación=psql
+2026-10-14 22:18:37.818 -03 [8932] postgres@food_store ::1 LOG:  sentencia: INSERT INTO categoria (nombre_categoria, descripcion_categoria)
+	VALUES ('__TP_U5_AUDIT__', 'categoria de prueba de auditoria TP-U5-PARTE-B')
+	RETURNING id_categoria;
+2026-10-14 22:18:37.822 -03 [8932] postgres@food_store ::1 LOG:  sentencia: UPDATE producto SET stock_producto = stock_producto + 1
+	WHERE id_producto = 1;
+2026-10-14 22:18:37.824 -03 [8932] postgres@food_store ::1 LOG:  sentencia: UPDATE producto SET stock_producto = stock_producto - 1
+	WHERE id_producto = 1;
+2026-10-14 22:18:37.825 -03 [8932] postgres@food_store ::1 LOG:  sentencia: DELETE FROM categoria WHERE nombre_categoria = '__TP_U5_AUDIT__';
+2026-10-14 22:18:37.919 -03 [8932] postgres@food_store ::1 LOG:  desconexiÃ³n: duraciÃ³n de sesiÃ³n: 0:00:00.156 usuario=postgres base=food_store host=::1 port=38568
+2026-10-14 22:18:38.087 -03 [14316] [desconocido]@[desconocido] ::1 LOG:  conexión recibida: host=::1 port=38569
+2026-10-14 22:18:38.114 -03 [14316] app_web@food_store ::1 FATAL:  la autentificación password falló para el usuario «app_web»
+2026-10-14 22:18:38.114 -03 [14316] app_web@food_store ::1 DETALLE:  La conexión coincidió con el archivo «C:/Program Files/PostgreSQL/16/data/pg_hba.conf» línea 117: «host    all             all             ::1/128                 scram-sha-256»

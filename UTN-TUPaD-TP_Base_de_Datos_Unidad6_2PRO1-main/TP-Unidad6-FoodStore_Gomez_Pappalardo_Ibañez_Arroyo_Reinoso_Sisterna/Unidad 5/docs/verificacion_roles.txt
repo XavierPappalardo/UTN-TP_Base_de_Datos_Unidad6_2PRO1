@@ -1,0 +1,262 @@
+# Verificacion de permisos — Parte A (salida real, 2026-10-15)
+# Generada con: \\du + information_schema.role_table_grants +
+# role_column_grants (tabla usuario) + role_routine_grants.
+# Base food_store rebuild desde SQL/{schema,objects,data}.sql + sql/roles.sql.
+# Pruebas negativas (deben FALLAR, y fallan):
+#  1. usr_reportes INSERT INTO pedido -> ERROR permiso denegado a la tabla pedido
+#  2. usr_lectura SELECT contrasena_usuario FROM usuario -> ERROR permiso denegado
+#  3. app_web GRANT admin_datos TO app_web -> ERROR se ha denegado el permiso
+# Casos positivos: usr_lectura lee columnas no sensibles OK; fn_autenticar
+#  ('juan@x.com','hash_juan')=t, pass mal=f, mail inexistente=f.
+# Tablas futuras (_verif_futura creada y eliminada): nacen con SELECT para
+#  lectura/soporte/reportes/auditor, SELECT+INSERT+UPDATE para escritura,
+#  ALL para admin_datos. ALTER DEFAULT PRIVILEGES verificado.
+================================================================================
+                                Lista de roles
+   Nombre de rol   |                         Atributos                         
+-------------------+-----------------------------------------------------------
+ admin_datos       | Crear rol                                                +
+                   | 5 conexiones
+ app_web           | 50 conexiones
+ postgres          | Superusuario, Crear rol, Crear BD, Replicacin, Ignora RLS
+ rol_app_escritura | No puede conectarse
+ rol_app_lectura   | No puede conectarse
+ rol_auditor       | No puede conectarse
+ rol_reportes      | No puede conectarse
+ rol_soporte       | No puede conectarse
+ usr_lectura       | 5 conexiones
+ usr_reportes      | 5 conexiones
+ usr_soporte       | 5 conexiones
+
+      grantee      |      table_name       | privilege_type 
+-------------------+-----------------------+----------------
+ admin_datos       | categoria             | DELETE
+ admin_datos       | categoria             | INSERT
+ admin_datos       | categoria             | REFERENCES
+ admin_datos       | categoria             | SELECT
+ admin_datos       | categoria             | TRIGGER
+ admin_datos       | categoria             | TRUNCATE
+ admin_datos       | categoria             | UPDATE
+ admin_datos       | detalle_pedido        | DELETE
+ admin_datos       | detalle_pedido        | INSERT
+ admin_datos       | detalle_pedido        | REFERENCES
+ admin_datos       | detalle_pedido        | SELECT
+ admin_datos       | detalle_pedido        | TRIGGER
+ admin_datos       | detalle_pedido        | TRUNCATE
+ admin_datos       | detalle_pedido        | UPDATE
+ admin_datos       | pedido                | DELETE
+ admin_datos       | pedido                | INSERT
+ admin_datos       | pedido                | REFERENCES
+ admin_datos       | pedido                | SELECT
+ admin_datos       | pedido                | TRIGGER
+ admin_datos       | pedido                | TRUNCATE
+ admin_datos       | pedido                | UPDATE
+ admin_datos       | producto              | DELETE
+ admin_datos       | producto              | INSERT
+ admin_datos       | producto              | REFERENCES
+ admin_datos       | producto              | SELECT
+ admin_datos       | producto              | TRIGGER
+ admin_datos       | producto              | TRUNCATE
+ admin_datos       | producto              | UPDATE
+ admin_datos       | usuario               | DELETE
+ admin_datos       | usuario               | INSERT
+ admin_datos       | usuario               | REFERENCES
+ admin_datos       | usuario               | SELECT
+ admin_datos       | usuario               | TRIGGER
+ admin_datos       | usuario               | TRUNCATE
+ admin_datos       | usuario               | UPDATE
+ admin_datos       | v_categorias_vigentes | DELETE
+ admin_datos       | v_categorias_vigentes | INSERT
+ admin_datos       | v_categorias_vigentes | REFERENCES
+ admin_datos       | v_categorias_vigentes | SELECT
+ admin_datos       | v_categorias_vigentes | TRIGGER
+ admin_datos       | v_categorias_vigentes | TRUNCATE
+ admin_datos       | v_categorias_vigentes | UPDATE
+ admin_datos       | v_pedido_detalle      | DELETE
+ admin_datos       | v_pedido_detalle      | INSERT
+ admin_datos       | v_pedido_detalle      | REFERENCES
+ admin_datos       | v_pedido_detalle      | SELECT
+ admin_datos       | v_pedido_detalle      | TRIGGER
+ admin_datos       | v_pedido_detalle      | TRUNCATE
+ admin_datos       | v_pedido_detalle      | UPDATE
+ admin_datos       | v_pedidos_resumen     | DELETE
+ admin_datos       | v_pedidos_resumen     | INSERT
+ admin_datos       | v_pedidos_resumen     | REFERENCES
+ admin_datos       | v_pedidos_resumen     | SELECT
+ admin_datos       | v_pedidos_resumen     | TRIGGER
+ admin_datos       | v_pedidos_resumen     | TRUNCATE
+ admin_datos       | v_pedidos_resumen     | UPDATE
+ admin_datos       | v_productos_vigentes  | DELETE
+ admin_datos       | v_productos_vigentes  | INSERT
+ admin_datos       | v_productos_vigentes  | REFERENCES
+ admin_datos       | v_productos_vigentes  | SELECT
+ admin_datos       | v_productos_vigentes  | TRIGGER
+ admin_datos       | v_productos_vigentes  | TRUNCATE
+ admin_datos       | v_productos_vigentes  | UPDATE
+ rol_app_escritura | detalle_pedido        | INSERT
+ rol_app_escritura | pedido                | INSERT
+ rol_app_escritura | v_categorias_vigentes | SELECT
+ rol_app_escritura | v_pedido_detalle      | SELECT
+ rol_app_escritura | v_pedidos_resumen     | SELECT
+ rol_app_escritura | v_productos_vigentes  | SELECT
+ rol_app_lectura   | categoria             | SELECT
+ rol_app_lectura   | detalle_pedido        | SELECT
+ rol_app_lectura   | pedido                | SELECT
+ rol_app_lectura   | producto              | SELECT
+ rol_app_lectura   | v_categorias_vigentes | SELECT
+ rol_app_lectura   | v_pedido_detalle      | SELECT
+ rol_app_lectura   | v_pedidos_resumen     | SELECT
+ rol_app_lectura   | v_productos_vigentes  | SELECT
+ rol_auditor       | categoria             | SELECT
+ rol_auditor       | detalle_pedido        | SELECT
+ rol_auditor       | pedido                | SELECT
+ rol_auditor       | producto              | SELECT
+ rol_auditor       | v_categorias_vigentes | SELECT
+ rol_auditor       | v_pedido_detalle      | SELECT
+ rol_auditor       | v_pedidos_resumen     | SELECT
+ rol_auditor       | v_productos_vigentes  | SELECT
+ rol_reportes      | categoria             | SELECT
+ rol_reportes      | detalle_pedido        | SELECT
+ rol_reportes      | pedido                | SELECT
+ rol_reportes      | producto              | SELECT
+ rol_reportes      | v_categorias_vigentes | SELECT
+ rol_reportes      | v_pedido_detalle      | SELECT
+ rol_reportes      | v_pedidos_resumen     | SELECT
+ rol_reportes      | v_productos_vigentes  | SELECT
+ rol_soporte       | categoria             | SELECT
+ rol_soporte       | detalle_pedido        | SELECT
+ rol_soporte       | pedido                | SELECT
+ rol_soporte       | producto              | SELECT
+ rol_soporte       | v_categorias_vigentes | SELECT
+ rol_soporte       | v_pedido_detalle      | SELECT
+ rol_soporte       | v_pedidos_resumen     | SELECT
+ rol_soporte       | v_productos_vigentes  | SELECT
+(101 filas)
+
+     grantee     |    column_name     | privilege_type 
+-----------------+--------------------+----------------
+ admin_datos     | apellido_usuario   | REFERENCES
+ admin_datos     | apellido_usuario   | INSERT
+ admin_datos     | apellido_usuario   | UPDATE
+ admin_datos     | apellido_usuario   | SELECT
+ admin_datos     | celular_usuario    | UPDATE
+ admin_datos     | celular_usuario    | REFERENCES
+ admin_datos     | celular_usuario    | INSERT
+ admin_datos     | celular_usuario    | SELECT
+ admin_datos     | contrasena_usuario | SELECT
+ admin_datos     | contrasena_usuario | INSERT
+ admin_datos     | contrasena_usuario | UPDATE
+ admin_datos     | contrasena_usuario | REFERENCES
+ admin_datos     | created_at         | INSERT
+ admin_datos     | created_at         | SELECT
+ admin_datos     | created_at         | REFERENCES
+ admin_datos     | created_at         | UPDATE
+ admin_datos     | eliminado          | UPDATE
+ admin_datos     | eliminado          | INSERT
+ admin_datos     | eliminado          | REFERENCES
+ admin_datos     | eliminado          | SELECT
+ admin_datos     | id_usuario         | SELECT
+ admin_datos     | id_usuario         | REFERENCES
+ admin_datos     | id_usuario         | UPDATE
+ admin_datos     | id_usuario         | INSERT
+ admin_datos     | mail_usuario       | UPDATE
+ admin_datos     | mail_usuario       | INSERT
+ admin_datos     | mail_usuario       | SELECT
+ admin_datos     | mail_usuario       | REFERENCES
+ admin_datos     | nombre_usuario     | UPDATE
+ admin_datos     | nombre_usuario     | INSERT
+ admin_datos     | nombre_usuario     | SELECT
+ admin_datos     | nombre_usuario     | REFERENCES
+ admin_datos     | rol                | SELECT
+ admin_datos     | rol                | INSERT
+ admin_datos     | rol                | UPDATE
+ admin_datos     | rol                | REFERENCES
+ postgres        | apellido_usuario   | SELECT
+ postgres        | apellido_usuario   | UPDATE
+ postgres        | apellido_usuario   | REFERENCES
+ postgres        | apellido_usuario   | INSERT
+ postgres        | celular_usuario    | INSERT
+ postgres        | celular_usuario    | SELECT
+ postgres        | celular_usuario    | REFERENCES
+ postgres        | celular_usuario    | UPDATE
+ postgres        | contrasena_usuario | SELECT
+ postgres        | contrasena_usuario | UPDATE
+ postgres        | contrasena_usuario | REFERENCES
+ postgres        | contrasena_usuario | INSERT
+ postgres        | created_at         | REFERENCES
+ postgres        | created_at         | UPDATE
+ postgres        | created_at         | INSERT
+ postgres        | created_at         | SELECT
+ postgres        | eliminado          | UPDATE
+ postgres        | eliminado          | REFERENCES
+ postgres        | eliminado          | SELECT
+ postgres        | eliminado          | INSERT
+ postgres        | id_usuario         | SELECT
+ postgres        | id_usuario         | UPDATE
+ postgres        | id_usuario         | REFERENCES
+ postgres        | id_usuario         | INSERT
+ postgres        | mail_usuario       | INSERT
+ postgres        | mail_usuario       | REFERENCES
+ postgres        | mail_usuario       | SELECT
+ postgres        | mail_usuario       | UPDATE
+ postgres        | nombre_usuario     | INSERT
+ postgres        | nombre_usuario     | SELECT
+ postgres        | nombre_usuario     | UPDATE
+ postgres        | nombre_usuario     | REFERENCES
+ postgres        | rol                | UPDATE
+ postgres        | rol                | REFERENCES
+ postgres        | rol                | INSERT
+ postgres        | rol                | SELECT
+ rol_app_lectura | apellido_usuario   | SELECT
+ rol_app_lectura | created_at         | SELECT
+ rol_app_lectura | eliminado          | SELECT
+ rol_app_lectura | id_usuario         | SELECT
+ rol_app_lectura | nombre_usuario     | SELECT
+ rol_app_lectura | rol                | SELECT
+ rol_auditor     | apellido_usuario   | SELECT
+ rol_auditor     | created_at         | SELECT
+ rol_auditor     | eliminado          | SELECT
+ rol_auditor     | id_usuario         | SELECT
+ rol_auditor     | nombre_usuario     | SELECT
+ rol_auditor     | rol                | SELECT
+ rol_reportes    | apellido_usuario   | SELECT
+ rol_reportes    | created_at         | SELECT
+ rol_reportes    | eliminado          | SELECT
+ rol_reportes    | id_usuario         | SELECT
+ rol_reportes    | nombre_usuario     | SELECT
+ rol_reportes    | rol                | SELECT
+ rol_soporte     | apellido_usuario   | SELECT
+ rol_soporte     | celular_usuario    | SELECT
+ rol_soporte     | created_at         | SELECT
+ rol_soporte     | eliminado          | SELECT
+ rol_soporte     | id_usuario         | SELECT
+ rol_soporte     | mail_usuario       | SELECT
+ rol_soporte     | nombre_usuario     | SELECT
+ rol_soporte     | rol                | SELECT
+(98 filas)
+
+      grantee      |     routine_name      | privilege_type 
+-------------------+-----------------------+----------------
+ PUBLIC            | sp_crear_pedido       | EXECUTE
+ admin_datos       | calcular_total_pedido | EXECUTE
+ admin_datos       | fn_autenticar         | EXECUTE
+ admin_datos       | fn_recalcular_total   | EXECUTE
+ admin_datos       | fn_resetear_password  | EXECUTE
+ admin_datos       | fn_set_subtotal       | EXECUTE
+ admin_datos       | fn_soft_delete        | EXECUTE
+ postgres          | calcular_total_pedido | EXECUTE
+ postgres          | fn_autenticar         | EXECUTE
+ postgres          | fn_recalcular_total   | EXECUTE
+ postgres          | fn_resetear_password  | EXECUTE
+ postgres          | fn_set_subtotal       | EXECUTE
+ postgres          | fn_soft_delete        | EXECUTE
+ postgres          | sp_crear_pedido       | EXECUTE
+ rol_app_escritura | calcular_total_pedido | EXECUTE
+ rol_app_escritura | fn_autenticar         | EXECUTE
+ rol_app_escritura | sp_crear_pedido       | EXECUTE
+ rol_app_lectura   | fn_autenticar         | EXECUTE
+ rol_auditor       | calcular_total_pedido | EXECUTE
+ rol_reportes      | calcular_total_pedido | EXECUTE
+ rol_soporte       | fn_autenticar         | EXECUTE
+(21 filas)
+
